@@ -14,3 +14,6 @@ DrumSlayer is a Transformer-based model designed to generate high-quality drum o
 3. **Evaluation**
     ```bash
     python evaluate.py --model_path /path/to/trained/model --test_data /path/to/test/data
+
+You can Check Demo Here
+https://hsuneh.notion.site/DrumSlayer-110005fe1b9443f58668c999c81c5745?pvs=4
