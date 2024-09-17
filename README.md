@@ -29,7 +29,7 @@ The input audio mixture is encoded into a sequence of discrete tokens using a fr
     - `--d`: Specify the device to use for computation. Options are `cpu` or `cuda:<device_number>`.
       Example: `python eval.py --d cuda:0`
     ```
-    python eval.py --inst **kick, snare, hihat**
+    python eval.py 
     python eval.py --inst **kick, snare, hihat** 
     python eval.py --inst **kick, snare, hihat** --i **input_wav_dir** --o **output_wav_dir** 
     python eval.py --inst **kick, snare, hihat** --i **input_wav_dir** --o **output_wav_dir** --d **device**
