@@ -30,9 +30,9 @@ The input audio mixture is encoded into a sequence of discrete tokens using a fr
       Example: `python eval.py --d cuda:0`
     ```
     python eval.py --inst **kick, snare, hihat**
-    python eval.py --inst **kick, snare, hihat** --d **device**
-    python eval.py --i **input_wav_dir** --o **output_wav_dir** 
-    python eval.py --i **input_wav_dir** --o **output_wav_dir** 
+    python eval.py --inst **kick, snare, hihat** 
+    python eval.py --inst **kick, snare, hihat** --i **input_wav_dir** --o **output_wav_dir** 
+    python eval.py --inst **kick, snare, hihat** --i **input_wav_dir** --o **output_wav_dir** --d **device**
 
 ## Check Demo 
 https://hsuneh.notion.site/DrumSlayer-110005fe1b9443f58668c999c81c5745?pvs=4
