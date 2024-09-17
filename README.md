@@ -59,4 +59,4 @@ Dataset generation process. First, kick, snare, and hi-hat loops are synthesized
 https://www.kaggle.com/datasets/sunehflower/random-mixture-one-shot-dataset-rmod
 
 ## Results
-![Figure 4](./figures/4_results.png)
+![Figure 4](./figures/4_result.png)
