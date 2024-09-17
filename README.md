@@ -15,7 +15,24 @@ The input audio mixture is encoded into a sequence of discrete tokens using a fr
     pip install -r requirements.txt
 3. **Evaluation**
     ```bash
-    python eval.py --i **input_wav_dir** --o **output_wav_dir** --train_type **kick, snare, hihat** --
+    python eval.py
+    ```
+    - `--inst`: Specify the type of drum instrument to extract. Options are `kick`, `snare`, or `hihat`.
+      Example: `python eval.py --inst kick`
+    
+    - `--i`: Specify the input directory containing the wav files.
+      Example: `python eval.py --i ./wavs`
+    
+    - `--o`: Specify the output directory where the results will be saved.
+      Example: `python eval.py --o ./results`
+    
+    - `--d`: Specify the device to use for computation. Options are `cpu` or `cuda:<device_number>`.
+      Example: `python eval.py --d cuda:0`
+    ```
+    python eval.py --inst **kick, snare, hihat**
+    python eval.py --inst **kick, snare, hihat** --d **device**
+    python eval.py --i **input_wav_dir** --o **output_wav_dir** 
+    python eval.py --i **input_wav_dir** --o **output_wav_dir** 
 
 ## Check Demo 
 https://hsuneh.notion.site/DrumSlayer-110005fe1b9443f58668c999c81c5745?pvs=4

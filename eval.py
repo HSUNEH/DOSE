@@ -160,7 +160,7 @@ if __name__ == "__main__":
     result_dir = '/disk2/st_drums/results/' #/drumonly/'
     audio_encoding_type = 'codes'
     parser = argparse.ArgumentParser()
-    parser.add_argument('--train_type', type=str, default='kick', help='kick, snare, hihat')
+    parser.add_argument('--inst', type=str, default='kick', help='kick, snare, hihat')
     parser.add_argument('--i', type=str, default='./wavs', help='input wav dir')
     parser.add_argument('--o', type=str, default='./results', help='output wav dir')
     # parser.add_argument('--wandb', type=bool, default=False, help='True, False')
@@ -178,7 +178,7 @@ if __name__ == "__main__":
         gpu = True
         if args.d.startswith('cuda'):
             torch.cuda.set_device(args.d)
-            
+
     NUM_WORKERS = 15
     ############################
     dac_model_path = dac.utils.download(model_type="44khz")
@@ -195,11 +195,11 @@ if __name__ == "__main__":
         config = EncoderDecoderConfig(audio_rep = audio_encoding_type, args = args)
         model = EncoderDecoderModule(config)
 
-    if args.train_type == 'kick':
+    if args.inst == 'kick':
         ckpt = torch.load('./checkpoints/kick.ckpt', map_location='cpu')
-    elif args.train_type == 'snare':
+    elif args.inst == 'snare':
         ckpt = torch.load('./checkpoints/snare.ckpt', map_location='cpu')
-    elif args.train_type == 'hihat':
+    elif args.inst == 'hihat':
         ckpt = torch.load('./checkpoints/hihat.ckpt', map_location='cpu')
     model.load_state_dict(ckpt['state_dict'])
 
@@ -212,7 +212,7 @@ if __name__ == "__main__":
 
     ### Generate
     # export CUDA_VISIBLE_DEVICES=1
-    error_list = inst_generate(test_dataloader, args.train_type, args)
+    error_list = inst_generate(test_dataloader, args.inst, args)
     print('error occured : ', error_list)
 
 
