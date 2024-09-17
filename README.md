@@ -14,9 +14,11 @@ The input audio mixture is encoded into a sequence of discrete tokens using a fr
     ```bash
     pip install -r requirements.txt
 3. **Download Model**
+
+
     download and locate .ckpt files in ./checkpoints/
 
-    
+
     kick.ckpt : https://drive.google.com/file/d/1qgCSwOv43AZNviVKy1rO_FBuuqsj1oGP/view?usp=sharing
     snare.ckpt : https://drive.google.com/file/d/1FN3Zqvnng_PDsXQ-T6Un87yjU85Gx-4H/view?usp=drive_link
     hihat.ckpt : https://drive.google.com/file/d/1jtBvDYHDVo8k7gY2_TX_3UucDQ-LJwmP/view?usp=drive_link
