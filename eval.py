@@ -1,21 +1,13 @@
 from inst_decoder import InstDecoderModule, InstDecoderConfig
 from torch.utils.data import DataLoader
-import lightning.pytorch as pl
 import os
-import audiofile as af
-import pretty_midi
-import matplotlib.pyplot as plt
 import argparse
 import torch
-from tqdm import tqdm
 import dac
-from dac.utils import load_model
-from dac.model import DAC
 import scipy.io.wavfile
 from einops import rearrange
 import numpy as np
 import os
-import shutil
 import librosa
 from torch.utils.data import Dataset
 import random
@@ -32,15 +24,14 @@ class Getwav(Dataset):
     def __len__(self):
         return len(self.wav_file)
     def __getitem__(self, idx):
-        # wav = af.read(self.file_path + self.wav_file[idx])[0]
         wav, sr = librosa.load(self.file_path + '/' +self.wav_file[idx], sr=None, mono=False)
         if sr != 44100:
             wav = librosa.resample(wav, sr, 44100)
         padded_wav = np.zeros((2, 44100*4))
-        padded_wav[:,:wav.shape[1]] = wav[:,:44100*4] # 앞의 4초만 사용
+        padded_wav[:,:wav.shape[1]] = wav[:,:44100*4] # only 4 seconds infront of the wav
         padded_wav = torch.tensor(padded_wav).float()
         padded_wav = padded_wav.unsqueeze(0)
-        # dac 돌리고 
+        
         if gpu:
             padded_wav = padded_wav.cuda()
 
@@ -104,18 +95,14 @@ def inst_generate(test_dataloader, inst, args):
         # y_pred, end, loss, padding_losses, padding_in_losses, audio_losses = model(batch) # torch.Size([1, seq_len, 9]), False
         y_pred, end = model(batch) # torch.Size([1, seq_len, 9]), False
 
-        if dac_only:
-            if not torch.all(y_pred[:,353,:] == 0):
-                print('Start Token FUCKED')
-            if not torch.all(y_pred[:,-1,:] == 0):
-                print('End Token FUCKED')
 
-            inst_tokens = y_pred[:,354:-1,:]
-            # Audio part only -> inst_tokens
-        else: 
-            if not torch.all(y_pred[:,-1,:] == 0):
-                print('End Token FUCKED')
-            inst_tokens = y_pred[:,1:-1,:]
+        if not torch.all(y_pred[:,353,:] == 0):
+            print('Start Token Crashed')
+        if not torch.all(y_pred[:,-1,:] == 0):
+            print('End Token Crashed')
+
+        inst_tokens = y_pred[:,354:-1,:]
+        # Audio part only -> inst_tokens
 
         ### 푸는 과정
 
@@ -172,7 +159,6 @@ if __name__ == "__main__":
     
     ######### MAIN #############
     
-    dac_only = True
     if args.d == 'cpu':
         gpu = False
     else:
@@ -188,13 +174,9 @@ if __name__ == "__main__":
     if gpu :
         dac_model.cuda()
     
-    if dac_only:
-        config = InstDecoderConfig(audio_rep = audio_encoding_type, args = args)
-        # model = InstDecoderModule(config, dac_model, 1)
-        model = InstDecoderModule(config, 1)
-    else:
-        config = EncoderDecoderConfig(audio_rep = audio_encoding_type, args = args)
-        model = EncoderDecoderModule(config)
+
+    config = InstDecoderConfig(audio_rep = audio_encoding_type, args = args)
+    model = InstDecoderModule(config, 1)
 
     if args.inst == 'kick':
         ckpt = torch.load('./checkpoints/kick.ckpt', map_location='cpu')

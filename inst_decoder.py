@@ -3,7 +3,6 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 import lightning.pytorch as pl
-import pl_bolts
 from tqdm import tqdm
 import numpy as np
 
@@ -12,7 +11,7 @@ from einops import rearrange
 
 class InstDecoderConfig:
     def __init__(self, audio_rep, args, **kwargs):
-        self.train_type = args.train_type
+        self.train_type = args.inst
         
         # # Encoder hparams.
         # self.enc_num_layers = 10//args.layer_cut
@@ -69,33 +68,33 @@ class InstDecoderModule(pl.LightningModule):
             self.audio_loss = nn.CrossEntropyLoss()
             self.padding_loss = nn.CrossEntropyLoss()
             self.dac_loss= nn.CrossEntropyLoss()
-            self.start_loss = nn.CrossEntropyLoss()
+            self.onset_loss = nn.CrossEntropyLoss()
             # self.loss_functions = [nn.CrossEntropyLoss() for _ in range(config.audio_rep_dim)] 
             # self.padding_loss_functions = [nn.CrossEntropyLoss() for _ in range(config.audio_rep_dim)] 
             # self.padding_in_loss_functions_l = [nn.CrossEntropyLoss() for _ in range(config.audio_rep_dim)]
             # self.padding_in_loss_functions_r = [nn.CrossEntropyLoss() for _ in range(config.audio_rep_dim)]
     def training_step(self, batch, batch_idx):
-        audio_losses, dac_losses, start_loss, mean_acc = self.step(batch,batch_idx)
+        audio_losses, dac_losses, onset_loss, mean_acc = self.step(batch,batch_idx)
 
 
         # self.log("train_total_loss", total_loss.item(), on_step=True, on_epoch=True, logger=True, sync_dist=True)
         # if self.config.train_type == 'kshm':
         self.log("train_audio_loss", audio_losses.item(), on_step=True, on_epoch=True, logger=True, sync_dist=True)
         self.log("train_dac_loss", dac_losses.item(), on_step=True, on_epoch=True, logger=True, sync_dist=True)
-        self.log("train_start_loss", start_loss.item(), on_step=True, on_epoch=True, logger=True, sync_dist=True)
+        self.log("train_onset_loss", onset_loss.item(), on_step=True, on_epoch=True, logger=True, sync_dist=True)
         self.log("train_mean_acc", mean_acc.item(), on_step=True, on_epoch=True, logger=True, sync_dist=True)
-        return (start_loss + audio_losses)
+        return (onset_loss + audio_losses)
     
     def validation_step(self, batch, batch_idx):
-        audio_losses, dac_losses,start_loss, mean_acc = self.step(batch,batch_idx)
+        audio_losses, dac_losses,onset_loss, mean_acc = self.step(batch,batch_idx)
         # self.log("valid_total_loss", total_loss.item(), on_step=True, on_epoch=True, logger=True, sync_dist=True)
         # if self.config.train_type == 'kshm':
         self.log("valid_audio_loss", audio_losses.item(), on_step=True, on_epoch=True, logger=True, sync_dist=True)
         self.log("valid_dac_loss", dac_losses.item(), on_step=True, on_epoch=True, logger=True, sync_dist=True)
-        self.log("valid_start_loss", start_loss.item(), on_step=True, on_epoch=True, logger=True, sync_dist=True)
+        self.log("valid_onset_loss", onset_loss.item(), on_step=True, on_epoch=True, logger=True, sync_dist=True)
         self.log("valid_mean_acc", mean_acc.item(), on_step=True, on_epoch=True, logger=True, sync_dist=True)
 
-        return (start_loss + audio_losses)
+        return (onset_loss + audio_losses)
 
     def configure_optimizers(self):
         self.optimizer = torch.optim.Adam(self.parameters(), lr=1e-4)
@@ -150,39 +149,39 @@ class InstDecoderModule(pl.LightningModule):
             dac_losses.append(self.dac_loss(dac_logits, dac_target.long()))
 
             #### Contents Start ####
-            start_losses = []
-            start_logits = pred[:,352:352+8+2,:] # b, s, d*v
-            start_logits = start_logits.view(start_logits.shape[0], start_logits.shape[1],9, 1025) # b, s, d, v
-            start_logits = rearrange(start_logits, 'b s d v -> b v s d') # b, v, s, d
-            start_target = target[:,352:352+8+2,:] # b, s, d
-            start_losses.append(self.start_loss(start_logits, start_target.long()))
+            onset_losses = []
+            onset_logits = pred[:,352:352+8+2,:] # b, s, d*v
+            onset_logits = onset_logits.view(onset_logits.shape[0], onset_logits.shape[1],9, 1025) # b, s, d, v
+            onset_logits = rearrange(onset_logits, 'b s d v -> b v s d') # b, v, s, d
+            onset_target = target[:,352:352+8+2,:] # b, s, d
+            onset_losses.append(self.onset_loss(onset_logits, onset_target.long()))
             
             #### Contents #### 
-            audio_losses = []
-            audio_logits = pred[:,352:352+self.config.inst_dac_length+8+2,:]
-            audio_logits = audio_logits.view(audio_logits.shape[0],audio_logits.shape[1],9, 1025)
-            audio_logits = rearrange(audio_logits, 'b s d v -> b v s d')
-            audio_target = target[:,352:352+self.config.inst_dac_length+8+2,:] # b s d
-            audio_losses.append(self.audio_loss(audio_logits, audio_target.long()))
+            full_length_losses = []
+            full_length_logits = pred[:,352:352+self.config.inst_dac_length+8+2,:]
+            full_length_logits = full_length_logits.view(full_length_logits.shape[0],full_length_logits.shape[1],9, 1025)
+            full_length_logits = rearrange(full_length_logits, 'b s d v -> b v s d')
+            full_length_target = target[:,352:352+self.config.inst_dac_length+8+2,:] # b s d
+            full_length_losses.append(self.full_length_loss(full_length_logits, full_length_target.long()))
             
             
             # Calculate Accuracy.
 
-            audio_accs = []
+            full_length_accs = []
             acc_logits = pred[:,352:352+self.config.inst_dac_length+8+2,:]
             acc_logits = acc_logits.view(acc_logits.shape[0],acc_logits.shape[1],9, 1025)
             acc_logits = rearrange(acc_logits, 'b s d v -> b v s d')
             acc_target = target[:,352:352+self.config.inst_dac_length+8+2,:] # s d
             acc_pred = torch.argmax(acc_logits, dim=1)
-            audio_acc = torch.sum(acc_pred == acc_target).float() / torch.numel(acc_target)
-            audio_accs.append(audio_acc)
+            full_length_acc = torch.sum(acc_pred == acc_target).float() / torch.numel(acc_target)
+            full_length_accs.append(full_length_acc)
 
         dac_loss = sum(dac_losses)/len(dac_losses)
-        start_loss = sum(start_losses)/len(start_losses)
-        audio_loss = sum(audio_losses)/len(audio_losses)
-        mean_acc = (sum(audio_accs)) /len(audio_accs)
+        onset_loss = sum(onset_losses)/len(onset_losses)
+        full_length_loss = sum(full_length_losses)/len(full_length_losses)
+        mean_acc = (sum(full_length_accs)) /len(full_length_accs)
         
-        return audio_loss, dac_loss, start_loss, mean_acc
+        return full_length_loss, dac_loss, onset_loss, mean_acc
 
 
 
@@ -284,7 +283,7 @@ class InstDecoder(nn.Module):
         
         batch_size = x_l.shape[0]
 
-        # Start token.
+        # onset token.
         end = False
         count = 0
         for i in tqdm(range(seq_len)):
@@ -473,104 +472,6 @@ class PositionalEncoder(nn.Module):
         x = x + self.pe[:x.size(1), :]
         return self.dropout(x)
 
-
-# class Encoder(nn.Module):
-#     def __init__(self, config):
-#         super().__init__()
-#         self.config = config
-#         self.layers = nn.ModuleList([EncoderLayer(config) for _ in range(config.enc_num_layers)])
-    
-#     def forward(self, x):
-#         # Input
-#         # x: [batch_size, seq_len, d_model]
-#         # Output
-#         # x: [batch_size, seq_len, d_model]
-#         for layer in self.layers:
-#             x = layer(x)
-   
-#         return x
-
-# class EncoderLayer(nn.Module):
-#     def __init__(self, config):
-#         super().__init__()
-
-#         self.config = config
-#         embed_dim = config.enc_d_model
-#         self.encoder_layer = nn.TransformerEncoderLayer(d_model=embed_dim, nhead=config.enc_num_heads, dropout=config.attn_dropout,batch_first=True, norm_first=True)
-#         # ff_dim = config.enc_d_ff
-#         # self.ln1 = nn.LayerNorm(embed_dim)
-#         # self.ln2 = nn.LayerNorm(embed_dim)
-#         # self.mha = nn.MultiheadAttention(embed_dim=embed_dim, num_heads=config.enc_num_heads, dropout=config.attn_dropout, batch_first=True)
-#         # self.ff = nn.Sequential(
-#         #     nn.Linear(embed_dim, ff_dim),
-#         #     nn.GELU(),
-#         #     nn.Linear(ff_dim, embed_dim),
-#         #     nn.Dropout(config.ff_dropout),
-#         # )
-    
-#     def forward(self, x):
-#         # # training2 # 원본
-#         # x = self.ln1(x)
-#         # x = x + self.mha(x,x,x)[0]
-#         # x = x + self.ff(self.ln2(x))
-    
-#         # # training
-#         # residual = x
-#         # x = residual + self.mha(x,x,x)[0]
-#         # x = self.ln1(x)
-        
-#         # residual = x
-#         # x = residual + self.ff(x)
-#         # x= self.ln2(x)
-        
-#         # # 정석으로 바꿔봤다
-#         x = self.encoder_layer(x)
-#         return x
-
-# class Decoder(nn.Module):
-#     def __init__(self, config):
-#         super().__init__()
-#         self.config = config
-#         self.layers = nn.ModuleList([DecoderLayer(config) for _ in range(config.dec_num_layers)])
-    
-#     def forward(self, x, enc_output):
-#         # Input
-#         # x: [batch_size, seq_len, d_model]
-#         # enc_output: [batch_size, seq_len, d_model]
-#         # Output
-#         # x: [batch_size, seq_len, d_model]
-#         for layer in self.layers:
-#             x = layer(x, enc_output)
-#         return x
-
-# class DecoderLayer(nn.Module):
-#     def __init__(self, config):
-#         super().__init__()
-#         self.config = config
-#         embed_dim = config.dec_d_model
-#         self.decoder_layer = nn.TransformerDecoderLayer(d_model=embed_dim, nhead=config.dec_num_heads, dropout=config.attn_dropout, batch_first=True, norm_first=True)
-#         # ff_dim = config.dec_d_ff
-        
-#         # self.ln1 = nn.LayerNorm(embed_dim)
-#         # self.ln2 = nn.LayerNorm(embed_dim)
-#         # self.ln3 = nn.LayerNorm(embed_dim)
-#         # self.mha1 = nn.MultiheadAttention(embed_dim=embed_dim, num_heads=config.dec_num_heads, dropout=config.attn_dropout, batch_first=True)
-#         # self.mha2 = nn.MultiheadAttention(embed_dim=embed_dim, num_heads=config.dec_num_heads, dropout=config.attn_dropout, batch_first=True)
-#         self.register_buffer("causal_mask", torch.triu(torch.ones(config.max_target_len, config.max_target_len).bool(), diagonal=1))
-#         # self.ff = nn.Sequential(
-#         #     nn.Linear(embed_dim, ff_dim),
-#         #     nn.GELU(),
-#         #     nn.Linear(ff_dim, embed_dim),
-#         #     nn.Dropout(config.ff_dropout),
-#         # )
-    
-#     def forward(self, x, enc_output):
-#         x = self.decoder_layer(x,enc_output,tgt_mask=self.causal_mask[:x.size(1),:x.size(1)] ,tgt_is_causal=True)
-#         # x = self.ln1(x)
-#         # x = x + self.mha1(x, x, x, is_causal=True, attn_mask=self.causal_mask[:x.size(1),:x.size(1)])[0]
-#         # x = x + self.mha2(self.ln2(x), enc_output, enc_output, is_causal=False)[0]
-#         # x = x + self.ff(self.ln3(x))
-#         return x    
 
 
 if __name__ == "__main__":
