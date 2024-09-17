@@ -13,7 +13,19 @@ The input audio mixture is encoded into a sequence of discrete tokens using a fr
 2. **Install Dependencies**
     ```bash
     pip install -r requirements.txt
-3. **Evaluation**
+3. **Download Model**
+    download and locate .ckpt files in ./checkpoints/
+
+    
+    kick.ckpt : https://drive.google.com/file/d/1qgCSwOv43AZNviVKy1rO_FBuuqsj1oGP/view?usp=sharing
+    snare.ckpt : https://drive.google.com/file/d/1FN3Zqvnng_PDsXQ-T6Un87yjU85Gx-4H/view?usp=drive_link
+    hihat.ckpt : https://drive.google.com/file/d/1jtBvDYHDVo8k7gY2_TX_3UucDQ-LJwmP/view?usp=drive_link
+
+    ```bash
+    wget https://github.com/HSUNEH/DOSE/releases/download/v1.0/dose.pt
+    ```
+    
+4. **Evaluation**
     ```bash
     python eval.py
     ```
@@ -29,10 +41,6 @@ The input audio mixture is encoded into a sequence of discrete tokens using a fr
     - `--d`: Specify the device to use for computation. Options are `cpu` or `cuda:<device_number>`.
       Example: `python eval.py --d cuda:0`
     ```
-    python eval.py 
-    python eval.py --inst **kick, snare, hihat** 
-    python eval.py --inst **kick, snare, hihat** --i **input_wav_dir** --o **output_wav_dir** 
-    python eval.py --inst **kick, snare, hihat** --i **input_wav_dir** --o **output_wav_dir** --d **device**
 
 ## 🎧 Check Demo 
 https://hsuneh.notion.site/DrumSlayer-110005fe1b9443f58668c999c81c5745?pvs=4
@@ -41,9 +49,7 @@ https://hsuneh.notion.site/DrumSlayer-110005fe1b9443f58668c999c81c5745?pvs=4
 ![Figure 3](./figures/3_dataset.png)
 Dataset generation process. First, kick, snare, and hi-hat loops are synthesized from one-shot drum audio samples using randomly generated MIDI notes. Next, optional bass, piano, guitar, and vocal loops are selected. The drum loops and other musical loops are then processed through independent mixing chains, which apply gain, EQ, compression, panning, limiting, delay, and reverb effects. Finally, all tracks are combined and passed through a mastering chain consisting of EQ and limiter effects.
 
-### You can download RMOD from Kaggle.(test, 10000 files)
+### You can download RMOD from Kaggle.(10000 files)
 
 https://www.kaggle.com/datasets/sunehflower/random-mixture-one-shot-dataset-rmod
 
-
-(Full Dataset Coming Soon)
