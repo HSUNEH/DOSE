@@ -1,2 +1,3 @@
-/results
-/_pycache_
+/results/kick/audio/
+/__pycache__
+/checkpoints/kick.ckpt

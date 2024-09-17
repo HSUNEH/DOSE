@@ -33,7 +33,7 @@ class Getwav(Dataset):
         return len(self.wav_file)
     def __getitem__(self, idx):
         # wav = af.read(self.file_path + self.wav_file[idx])[0]
-        wav, sr = librosa.load(self.file_path + self.wav_file[idx], sr=None, mono=False)
+        wav, sr = librosa.load(self.file_path + '/' +self.wav_file[idx], sr=None, mono=False)
         if sr != 44100:
             wav = librosa.resample(wav, sr, 44100)
         padded_wav = np.zeros((2, 44100*4))
@@ -53,7 +53,7 @@ class Getwav(Dataset):
         audio_rep = audio_rep.cpu()
         audio_rep_l = tokenize_inst(audio_rep,4) # MONO, (9, 345+8)
         audio_dac = rearrange(audio_rep_l, 'd t -> t d') # (345+8, 9)
-        return audio_dac, torch.tensor(0).float(), idx # (9, 345+8), 0
+        return audio_dac, torch.tensor(0).float(), self.wav_file[idx] # (9, 345+8), 0
 
 def tokenize_inst(inst_dac_l,length): # inst_dac_l : b, 9, seq (345 or 173)    
 
@@ -74,9 +74,9 @@ def tokenize_inst(inst_dac_l,length): # inst_dac_l : b, 9, seq (345 or 173)
         all_tokens_np[i, start: end] = codes.numpy() + 1 # +2000
     return all_tokens_np # (9,345)
 
-def dataset_wav_load(data_dir,BATCH_SIZE):
+def dataset_wav_load(data_dir):
     dataset = Getwav(data_dir)
-    dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
+    dataloader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=0)
     # mixed_loop(2, 176400), kick(2, 88200), snare(2, 88200), hhclosed(2, 88200)
     return dataloader
     
@@ -94,7 +94,7 @@ def inst_generate(test_dataloader, inst, args):
     for batch_idx, batch in (enumerate(test_dataloader)):
         # mixed_loops, inst_shot = batch
         mixed_loops, inst_shot, num_idx = batch
-        num_idx = num_idx.item()
+        num_idx = num_idx[0][:-4]
         if gpu:
             mixed_loops = mixed_loops.cuda()
             inst_shot = inst_shot.cuda()
@@ -149,15 +149,7 @@ def inst_generate(test_dataloader, inst, args):
                 print(output_dir)
                 os.makedirs(os.path.dirname(output_dir), exist_ok=True) #(1, 18432)
                 scipy.io.wavfile.write(output_dir, 44100, audio.T)
-            for _, codes in enumerate([mixed_loops]):
-                inst_codes = codes.permute(0,2,1) # torch.Size([1, 9, seq_len])
-                latent = dac_model.quantizer.from_codes(inst_codes)[0]
-                audio = dac_model.decode(latent)[0]
-                audio = audio.detach().cpu().numpy().astype(np.float32)
-                audio = audio_padding(audio,44100*4)
-                output_dir = args.o + f'/{inst}/audio/{num_idx}_{inst}_a.wav'
-                os.makedirs(os.path.dirname(output_dir), exist_ok=True) #(1, 18432)
-                scipy.io.wavfile.write(output_dir, 44100, audio.T)
+
     return error_list
 
 
@@ -169,12 +161,11 @@ if __name__ == "__main__":
     audio_encoding_type = 'codes'
     parser = argparse.ArgumentParser()
     parser.add_argument('--train_type', type=str, default='kick', help='kick, snare, hihat')
-    parser.add_argument('--i', type=str, required=True, help='input wav dir')
+    parser.add_argument('--i', type=str, default='./wavs', help='input wav dir')
     parser.add_argument('--o', type=str, default='./results', help='output wav dir')
     # parser.add_argument('--wandb', type=bool, default=False, help='True, False')
     parser.add_argument('--layer_cut', type=int, default='1', help='enc(or dec)_num_layers // layer_cut')
     parser.add_argument('--dim_cut', type=int, default='1', help='enc(or dec)_num_heads, _d_model // dim_cut')
-    parser.add_argument('--batch_size', type=int, default='1', help='batch size')
     args = parser.parse_args()
     
     ######### MAIN #############
@@ -182,7 +173,6 @@ if __name__ == "__main__":
     dac_only = True
     gpu = True
 
-    BATCH_SIZE = 1
     NUM_WORKERS = 15
     ############################
     dac_model_path = dac.utils.download(model_type="44khz")
@@ -212,7 +202,7 @@ if __name__ == "__main__":
     model.eval() 
 
     ### real wav DATA 
-    test_dataloader = dataset_wav_load(args.i, 1)
+    test_dataloader = dataset_wav_load(args.i)
 
     ### Generate
     # export CUDA_VISIBLE_DEVICES=1

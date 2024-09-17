@@ -4,8 +4,8 @@ Drum one-shot samples are crucial for music production, particularly in sound de
 ![Figure 2](./figures/2_method.png)
 The input audio mixture is encoded into a sequence of discrete tokens using a frozen DAC encoder, which are then fed into a decoder-only Transformer. The Transformer is trained to autoregressively predict the groundtruth drum one-shot tokens by minimizing two losses: onset loss and full-length loss. Finally, the predicted token sequence is decoded into drum one-shot audio using the DAC decoder.
 
-<!-- ## How to Run -->
-<!-- 
+## How to Run
+
 1. **Clone the Repository:**
    ```bash
    git clone https://github.com/HSUNEH/DOSE.git
@@ -15,7 +15,7 @@ The input audio mixture is encoded into a sequence of discrete tokens using a fr
     pip install -r requirements.txt
 3. **Evaluation**
     ```bash
-    python evaluate.py --model_path /path/to/trained/model --test_data /path/to/test/data -->
+    python eval.py --i ./
 
 ## Check Demo 
 https://hsuneh.notion.site/DrumSlayer-110005fe1b9443f58668c999c81c5745?pvs=4
