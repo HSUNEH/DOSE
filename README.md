@@ -1,6 +1,8 @@
 # DOSE : Drum One-Shot Extraction
 This repository contains the inference script for the DOSE model. 
+
 You can view the demo results in the demo section. 
+
 You can also check the dataset information.
 
 ![Figure 1](./figures/1_task.png)
