@@ -166,13 +166,19 @@ if __name__ == "__main__":
     # parser.add_argument('--wandb', type=bool, default=False, help='True, False')
     parser.add_argument('--layer_cut', type=int, default='1', help='enc(or dec)_num_layers // layer_cut')
     parser.add_argument('--dim_cut', type=int, default='1', help='enc(or dec)_num_heads, _d_model // dim_cut')
+    parser.add_argument('--d', type=str, default='cpu', help='device: cpu, cuda:0, cuda:1, cuda:2, cuda:3')
     args = parser.parse_args()
     
     ######### MAIN #############
     
     dac_only = True
-    gpu = True
-
+    if args.d == 'cpu':
+        gpu = False
+    else:
+        gpu = True
+        if args.d.startswith('cuda'):
+            torch.cuda.set_device(args.d)
+            
     NUM_WORKERS = 15
     ############################
     dac_model_path = dac.utils.download(model_type="44khz")

@@ -15,7 +15,7 @@ The input audio mixture is encoded into a sequence of discrete tokens using a fr
     pip install -r requirements.txt
 3. **Evaluation**
     ```bash
-    python eval.py --i ./
+    python eval.py --i **input_wav_dir** --o **output_wav_dir** --train_type **kick, snare, hihat** --
 
 ## Check Demo 
 https://hsuneh.notion.site/DrumSlayer-110005fe1b9443f58668c999c81c5745?pvs=4
