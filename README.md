@@ -13,5 +13,9 @@ Drum one-shot samples are crucial for music production, particularly in sound de
     ```bash
     python evaluate.py --model_path /path/to/trained/model --test_data /path/to/test/data -->
 
-You can Check Demo Here
+## Check Demo 
 https://hsuneh.notion.site/DrumSlayer-110005fe1b9443f58668c999c81c5745?pvs=4
+
+## Download RMOD (Random Mixture One-shot Dataset)
+https://www.kaggle.com/datasets/sunehflower/random-mixture-one-shot-dataset-rmod
+(Full Dataset Coming Soon)
