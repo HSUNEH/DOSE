@@ -34,14 +34,14 @@ The input audio mixture is encoded into a sequence of discrete tokens using a fr
     python eval.py --inst **kick, snare, hihat** --i **input_wav_dir** --o **output_wav_dir** 
     python eval.py --inst **kick, snare, hihat** --i **input_wav_dir** --o **output_wav_dir** --d **device**
 
-## Check Demo 
+## 🎧 Check Demo 
 https://hsuneh.notion.site/DrumSlayer-110005fe1b9443f58668c999c81c5745?pvs=4
 
 ## RMOD (Random Mixture One-shot Dataset)
 ![Figure 3](./figures/3_dataset.png)
 Dataset generation process. First, kick, snare, and hi-hat loops are synthesized from one-shot drum audio samples using randomly generated MIDI notes. Next, optional bass, piano, guitar, and vocal loops are selected. The drum loops and other musical loops are then processed through independent mixing chains, which apply gain, EQ, compression, panning, limiting, delay, and reverb effects. Finally, all tracks are combined and passed through a mastering chain consisting of EQ and limiter effects.
 
-You can download RMOD from Kaggle.(test, 10000 files)
+### You can download RMOD from Kaggle.(test, 10000 files)
 
 https://www.kaggle.com/datasets/sunehflower/random-mixture-one-shot-dataset-rmod
 
