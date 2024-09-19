@@ -30,6 +30,7 @@ The input audio mixture is encoded into a sequence of discrete tokens using a fr
     install sox (soxbindings(==1.2.3))
     ```bash
     conda install -c conda-forge sox
+    or
     sudo apt-get install sox libsox-dev
     ```
 3. **Download Model**
