@@ -1,13 +1,6 @@
 # Python 3.10.13
 # torch==2.0.1
 
-
-# pymixconsole
-# pip install git+https://github.com/csteinmetz1/pymixconsole
-
-# soxbindings==1.2.3
-# conda install -c conda-forge sox
-# sudo apt-get install sox libsox-dev
 descript-audio-codec==1.0.0
 audiofile==1.2.1
 descript_audio_codec==1.0.0
@@ -35,3 +28,12 @@ torch==2.0.1
 tqdm==4.64.0
 lightning==1.9.5
 
+
+## For data generation
+
+# pymixconsole
+# pip install git+https://github.com/csteinmetz1/pymixconsole
+
+# soxbindings==1.2.3
+# conda install -c conda-forge sox
+# sudo apt-get install sox libsox-dev
