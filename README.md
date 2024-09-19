@@ -10,6 +10,9 @@ Drum one-shot extraction task. Given an audio mixture as input, the task aims to
 ![Figure 2](./figures/2_method.png)
 The input audio mixture is encoded into a sequence of discrete tokens using a frozen DAC encoder, which are then fed into a decoder-only Transformer. The Transformer is trained to autoregressively predict the groundtruth drum one-shot tokens by minimizing two losses: onset loss and full-length loss. Finally, the predicted token sequence is decoded into drum one-shot audio using the DAC decoder.
 
+## 🎧 Check Demo 
+https://hsuneh.notion.site/DrumSlayer-110005fe1b9443f58668c999c81c5745?pvs=4
+
 ## How to Run
 
 1. **Clone the Repository:**
@@ -49,9 +52,6 @@ The input audio mixture is encoded into a sequence of discrete tokens using a fr
     - `--d`: Specify the device to use for computation. Options are `cpu` or `cuda:<device_number>`.
       Example: `python eval.py --d cuda:0`
 
-
-## 🎧 Check Demo 
-https://hsuneh.notion.site/DrumSlayer-110005fe1b9443f58668c999c81c5745?pvs=4
 
 ## RMOD (Random Mixture One-shot Dataset)
 ![Figure 3](./figures/3_dataset.png)
