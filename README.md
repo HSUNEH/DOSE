@@ -17,6 +17,8 @@ The input audio mixture is encoded into a sequence of discrete tokens using a fr
    git clone https://github.com/HSUNEH/DOSE.git
    cd DOSE
 2. **Install Dependencies**
+
+
     This code works with Python 3.10.13.
     ```bash
     pip install -r requirements.txt
@@ -29,8 +31,6 @@ The input audio mixture is encoded into a sequence of discrete tokens using a fr
     kick.ckpt : https://drive.google.com/file/d/1qgCSwOv43AZNviVKy1rO_FBuuqsj1oGP/view?usp=sharing
     snare.ckpt : https://drive.google.com/file/d/1FN3Zqvnng_PDsXQ-T6Un87yjU85Gx-4H/view?usp=drive_link
     hihat.ckpt : https://drive.google.com/file/d/1jtBvDYHDVo8k7gY2_TX_3UucDQ-LJwmP/view?usp=drive_link
-
-    
 4. **Evaluation**
     ```bash
     python eval.py
@@ -46,7 +46,7 @@ The input audio mixture is encoded into a sequence of discrete tokens using a fr
     
     - `--d`: Specify the device to use for computation. Options are `cpu` or `cuda:<device_number>`.
       Example: `python eval.py --d cuda:0`
-    ```
+
 
 ## 🎧 Check Demo 
 https://hsuneh.notion.site/DrumSlayer-110005fe1b9443f58668c999c81c5745?pvs=4
