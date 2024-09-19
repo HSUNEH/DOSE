@@ -23,16 +23,7 @@ The input audio mixture is encoded into a sequence of discrete tokens using a fr
     ```bash
     pip install -r requirements.txt
     ```
-    install pymixconsole
-    ```bash 
-    pip install git+https://github.com/csteinmetz1/pymixconsole
-    ```
-    install sox (soxbindings(==1.2.3))
-    ```bash
-    conda install -c conda-forge sox
-    or
-    sudo apt-get install sox libsox-dev
-    ```
+
 3. **Download Model**
 
 
