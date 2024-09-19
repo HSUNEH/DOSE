@@ -17,6 +17,7 @@ The input audio mixture is encoded into a sequence of discrete tokens using a fr
    git clone https://github.com/HSUNEH/DOSE.git
    cd DOSE
 2. **Install Dependencies**
+    This code works with Python 3.10.13.
     ```bash
     pip install -r requirements.txt
 3. **Download Model**

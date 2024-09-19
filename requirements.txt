@@ -1,3 +1,5 @@
+# Python 3.10.13
+torch==2.0.1
 aubio==0.4.9
 audiofile==1.2.1
 descript_audio_codec==1.0.0
