@@ -8,7 +8,7 @@ descript_audiotools==0.7.2
 einops==0.8.0
 encodec==0.1.1
 librosa==0.10.1
-lightning==2.1.0
+lightning==1.9.5
 lightning_bolts==0.7.0
 matplotlib==3.7.1
 miditoolkit==1.0.1
