@@ -13,6 +13,10 @@ The input audio mixture is encoded into a sequence of discrete tokens using a fr
 ## 🎧 Check Demo 
 https://hsuneh.notion.site/DrumSlayer-110005fe1b9443f58668c999c81c5745?pvs=4
 
+## 📄 Paper
+1. IEEE ICASSP 2025: [“DOSE: Drum One‑Shot Extraction from Music Mixture” (IEEE Xplore)](https://ieeexplore.ieee.org/document/10889237/)  
+2. arXiv: [“DOSE: Drum One‑Shot Extraction from Music Mixture” (arXiv ’25)](https://arxiv.org/abs/2504.18157)
+
 ## How to Run
 
 1. **Clone the Repository:**
